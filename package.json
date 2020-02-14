@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KirillGudkov/react-native-in-app-message.git"
+    "url": "git+https://github.com/vuongductuanktmt/react-native-in-app-message.git"
   },
   "author": "Kirill Gudkov",
   "license": "ISC",
