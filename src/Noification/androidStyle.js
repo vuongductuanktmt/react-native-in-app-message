@@ -5,7 +5,6 @@ export const androidStyle = StyleSheet.create({
     width: '96%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
     top: 0,
     elevation: 6,
     zIndex: 2,
