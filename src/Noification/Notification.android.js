@@ -11,7 +11,8 @@ export class Notification extends NotificationBase {
 	static defaultProps = {
 		duration: 2000,
 		autohide: true,
-    blurAmount: 7
+    blurAmount: 7,
+    showKnob: true
 	};
 
 	offset = StatusBar.currentHeight;
@@ -47,7 +48,7 @@ export class Notification extends NotificationBase {
 	}
 
 	render() {
-		const {customComponent, onPress, style} = this.props;
+		const {customComponent, onPress, style, showKnob} = this.props;
 		const animatedStyle = [androidStyle.notification,
 			style, {
 				top: this.offset,
@@ -62,6 +63,9 @@ export class Notification extends NotificationBase {
 						<TouchableOpacity style={[androidStyle.container]} activeOpacity={1} onPress={onPress}>
 							<View style={androidStyle.content}>
 								{customComponent ? this.renderCustomComponent() : this.renderOwnComponent()}
+                {showKnob &&
+                <View style={ androidStyle.knob } />
+                }
 							</View>
 						</TouchableOpacity>
 					</Animated.View>
