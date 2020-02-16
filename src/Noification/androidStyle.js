@@ -27,4 +27,11 @@ export const androidStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  knob: {
+    width: 50,
+    height: 4,
+    backgroundColor: '#d8d8d8',
+    borderRadius: 4,
+    marginVertical: 6,
+  },
 });
