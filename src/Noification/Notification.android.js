@@ -3,6 +3,7 @@ import {
   Animated,
   View,
   Text,
+  StatusBar
 } from 'react-native';
 import {
   PanGestureHandler,
@@ -19,9 +20,10 @@ export class Notification extends NotificationBase {
   static defaultProps = {
     duration: 2000,
     autohide: true,
+    showKnob: true,
   };
 
-  offset = 0;
+  offset = StatusBar.currentHeight;
 
   onHandlerStateChange = (event) => {
     const {velocityY, translationY, numberOfPointers, state} = event.nativeEvent;
@@ -59,6 +61,7 @@ export class Notification extends NotificationBase {
       customComponent,
       onPress,
       style,
+      showKnob
     } = this.props;
 
     const animatedStyle = [
@@ -67,6 +70,7 @@ export class Notification extends NotificationBase {
       {
         top: this.offset,
         transform: [{translateY: this.translateY}],
+        borderRadius: 10,
         backgroundColor: `rgba(255,255,255,${this.props.blurAmount/100})`
       },
     ];
