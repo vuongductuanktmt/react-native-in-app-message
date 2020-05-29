@@ -86,8 +86,7 @@ export class Notification extends NotificationBase {
               onHandlerStateChange={this.onTapHandlerStateChange}>
               <View style={androidStyle.content}>
                 {customComponent ? customComponent : this.renderOwnComponent()}
-                {showKnob &&
-                <View style={ androidStyle.knob } />
+                {showKnob && <View style={ androidStyle.knob } />}
               </View>
             </TapGestureHandler>
 
