@@ -53,96 +53,134 @@ export class NotificationBase extends React.Component {
 
 	timer;
 
-	show = () => {
-		const {onShow, tapticFeedback, hideStatusBar} = this.props;
-		clearTimeout(this.timer);
-		Animated.timing(this.translateY, {
-			toValue: 0,
-			useNativeDriver: true,
-			duration: animatedDuration,
-			easing: Easing.bezier(.0, .74, .2, IS_IOS ? 1.12 : 1)
-		}).start(this.autohide);
+  show = () => {
 
-		if (onShow) {
-			onShow();
-		}
-		if (hideStatusBar) {
-			IS_IOS && StatusBar.setHidden(true, 'slide');
-		}
-		if (tapticFeedback && IS_IOS) {
-			TapticFeedback.impact();
-		}
-	};
+    const {
+      onShow,
+      tapticFeedback,
+      hideStatusBar,
+    } = this.props;
 
-	hide = () => {
-		const {hideStatusBar, onHide} = this.props;
-		Animated.timing(this.translateY, {
-			toValue: (this.viewHeight + navBarOffset + this.offset * 2) * -1,
-			useNativeDriver: true,
-			duration: animatedDuration,
-			easing: Easing.bezier(.53, .67, .19, 1.1)
-		}).start();
-		if (onHide) {
-			onHide();
-		}
-		if (hideStatusBar) {
-			IS_IOS && StatusBar.setHidden(false, 'slide');
-		}
-	};
+    this.autohide();
 
-	autohide = () => {
-		const {autohide, duration} = this.props;
-		autohide && (this.timer = setTimeout(this.hide, duration));
-	};
+    Animated.spring(this.translateY, {
+      toValue: 0,
+      useNativeDriver: true,
+    }).start();
 
-	onGestureEvent = (event) => {
-		const {translationY} = event.nativeEvent;
+    if (onShow) {
+      onShow();
+    }
 
-		this.translateY.setValue(translationY > 0 ? translationY / 9 : translationY / 3.5);
+    if (hideStatusBar) {
+      IS_IOS && StatusBar.setHidden(true, 'slide');
+    }
 
-		if (this.props.onDragGestureEvent) {
-			this.props.onDragGestureEvent(event);
-		}
-	};
+    if (tapticFeedback && IS_IOS) {
+      TapticFeedback.impact();
+    }
+  };
 
-	onHandlerStateChange = (event) => {
-		const {velocityY, translationY, numberOfPointers} = event.nativeEvent;
+  hide = () => {
 
-		if (this.props.onDragGestureHandlerStateChange) {
-			this.props.onDragGestureHandlerStateChange(event);
-		}
+    const {
+      hideStatusBar,
+      onHide,
+    } = this.props;
 
-		if (velocityY < minVelocityToFling && numberOfPointers === 0) {
-			Animated.spring(this.translateY, {
-				toValue: (this.viewHeight + this.offset * 2) * -1,
-				useNativeDriver: true,
-				velocity: velocityY,
-			}).start();
-			return;
-		}
+    Animated.timing(this.translateY, {
+      toValue: (this.viewHeight + navBarOffset + this.offset * 2) * -1,
+      useNativeDriver: true,
+      duration: animatedDuration,
+      easing: Easing.bezier(.53, .67, .19, 1.1),
+    }).start();
 
-		if (translationY > ((this.viewHeight / 2) * -1) && numberOfPointers === 0) {
-			this.show();
-		} else {
-			this.hide();
-		}
-	};
+    if (onHide) {
+      onHide();
+    }
 
-	handleOnLayout = (event) => {
-		const {height} = event.nativeEvent.layout;
-		this.viewHeight = height;
-		if (!this.onLayoutHasBeenInvoked) {
-			this.onLayoutHasBeenInvoked = true;
-			this.translateY.setValue((height + navBarOffset + this.offset * 2) * -1)
-		}
-	};
+    if (hideStatusBar) {
+      IS_IOS && StatusBar.setHidden(false, 'slide');
+    }
+  };
 
-	renderCustomComponent() {
-		return this.props.customComponent;
-	}
+  autohide = () => {
 
-	renderOwnComponent() {
-		const {textColor, text} = this.props;
-		return <Text style={[IOStyle.text, {color: textColor}]}>{text}</Text>;
-	}
+    const {
+      autohide,
+      duration,
+    } = this.props;
+
+    clearTimeout(this.timer);
+    this.timer = undefined;
+    autohide && (this.timer = setTimeout(this.hide, duration));
+  };
+
+  onGestureEvent = (event) => {
+
+    const {translationY} = event.nativeEvent;
+
+    const value = translationY > 0
+      ? translationY / 9
+      : translationY / (IS_IOS ? 2 : 1);
+
+    this.translateY.setValue(value);
+
+    if (this.props.onDragGestureEvent) {
+      this.props.onDragGestureEvent(event);
+    }
+  };
+
+  onHandlerStateChange = (event) => {
+    const {velocityY, translationY, numberOfPointers} = event.nativeEvent;
+
+    if (this.props.onDragGestureHandlerStateChange) {
+      this.props.onDragGestureHandlerStateChange(event);
+    }
+
+    if (velocityY < minVelocityToFling && numberOfPointers === 0) {
+      Animated.spring(this.translateY, {
+        toValue: (this.viewHeight + this.offset * 2) * -1,
+        useNativeDriver: true,
+        velocity: velocityY,
+      }).start();
+      return;
+    }
+
+    if (translationY > ((this.viewHeight / 2) * -1) && numberOfPointers === 0) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  };
+
+  onTapHandlerStateChange = (event) => {
+    const {state} = event.nativeEvent;
+
+    switch (state) {
+      case 2:
+        clearTimeout(this.timer);
+        break;
+      case 4:
+        this.autohide();
+        this.props.onPress();
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleOnLayout = (event) => {
+    const {height} = event.nativeEvent.layout;
+    this.viewHeight = height;
+    if (!this.onLayoutHasBeenInvoked) {
+      this.onLayoutHasBeenInvoked = true;
+      this.translateY.setValue((height + navBarOffset + this.offset * 2) * -1);
+    }
+  };
+
+  renderOwnComponent() {
+    const {textColor, text} = this.props;
+    return <Text style={[IOStyle.text, {color: textColor}]}>{text}</Text>;
+  }
 }
