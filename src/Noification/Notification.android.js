@@ -12,7 +12,7 @@ import {
 import { NotificationBase } from './NotificationBase'
 import { androidStyle } from './androidStyle'
 
-const MIN_VELOCITY_TO_FLING = -350
+const MIN_VELOCITY_TO_FLING = -2106
 const BOUNCE_OFFSET = 150
 
 export class Notification extends NotificationBase {
@@ -31,7 +31,7 @@ export class Notification extends NotificationBase {
     if (this.props.onDragGestureHandlerStateChange) {
       this.props.onDragGestureHandlerStateChange(event)
     }
-
+    console.log(velocityY, MIN_VELOCITY_TO_FLING, numberOfPointers)
     if (velocityY < MIN_VELOCITY_TO_FLING && numberOfPointers === 1) {
       Animated.spring(this.translateY, {
         toValue: (this.viewHeight + BOUNCE_OFFSET + this.offset * 2) * -1,
